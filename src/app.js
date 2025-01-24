@@ -8,4 +8,6 @@ app.get('/', (req, res) => {
 })
 app.listen(port, () => {
     console.log(`I am listening from the port ${port}`);
+    console.log("Added features");
+
 })
