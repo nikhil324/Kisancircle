@@ -6,12 +6,16 @@ const { homerouter } = require('./routes/home.routes');
 const { userrouter } = require('./routes/user.routes');
 const port = process.env.PORT;
 app.use(express.json());
-dbConnection();
+
 
 app.use('/', homerouter);
 app.use('/', userrouter);
-app.listen(port, () => {
-    console.log(`I am listening from the port ${port}`);
-    console.log("Added features");
+dbConnection().then(() => {
+    console.log("data base connection established");
+    app.listen(port, () => {
+        console.log(`listing on port  ${port}`);
+    })
 
-})
+}).catch(() => {
+    console.error("Database connection failed", err);
+});
