@@ -4,6 +4,6 @@ const { registerController, loginController } = require('../controller/user.cont
 
 userrouter.route('/').get();
 userrouter.route('/signup').post(registerController);
-userrouter.route('/login').get(loginController);
+userrouter.route('/login').post(loginController);
 
 module.exports = { userrouter };

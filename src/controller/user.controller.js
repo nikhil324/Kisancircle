@@ -24,7 +24,8 @@ const loginController = async (req, res) => {
         }
         else {
             res.status(201).send({
-                Login: result
+                Login: result,
+
             });
         }
     }

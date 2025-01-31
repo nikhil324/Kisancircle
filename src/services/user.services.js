@@ -8,7 +8,6 @@ const registerUser = async (req) => {
         data.password = encryptpass;
         const registerdata = new User(data);
         const result = await registerdata.save();
-        console.log(result);
         return result;
     }
     catch (error) {
@@ -20,6 +19,8 @@ const userLogin = async (req) => {
         const logdata = req.body;
         const email = logdata.email;
         const user = await User.findOne({ email });
+
+
         if (!user) {
             return false;
         }
