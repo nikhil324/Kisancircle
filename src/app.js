@@ -1,4 +1,4 @@
-const express = require('exprss');
+const express = require('express');
 const app = express();
 require("dotenv").config();
 const { dbConnection } = require('./config/conn');
