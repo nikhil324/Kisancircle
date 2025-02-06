@@ -9,7 +9,7 @@ const maintain_session_service = async (req, res) => {
         const check_user = await verify_token(req);
         req.user = check_user;
         const isUser = await User.find({ email: req.user.email });
-        //console.log(isUser);
+
         if (isUser) {
             const user = isUser[0]._id;
             const isSession = await Session.find({ user_id: user })
