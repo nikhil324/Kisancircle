@@ -13,7 +13,7 @@ const registerUser = async (req) => {
         const registerdata = new User(data);
         const token = jwt.sign({ email: data.email, user_id: data._id, name: data.name }, process.env.SECRETKEY, { expiresIn: "1d" });
         console.log(token);
-        await maintain_session_control(req);
+        //await maintain_session_control(req);
         const result = await registerdata.save();
         return result;
     }

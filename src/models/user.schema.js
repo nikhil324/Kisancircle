@@ -29,20 +29,6 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    isVerified: {
-        type: Boolean,
-        default: false
-    },
-    verificationToken: {
-        type: String,
-    },
-    verificationTokenExpiry: {
-        type: Date,
-    },
-    date: {
-        type: Date,
-        default: Date.now
-    }
 }, { timestamps: true });
 
 

@@ -4,9 +4,21 @@ require("dotenv").config();
 const { dbConnection } = require('./src/config/conn');
 const { homerouter } = require('./src/routes/home.routes');
 const { userrouter } = require('./src/routes/user.routes');
+const swaggerJSDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+const { swaggerDefinition } = require("./src/swaggerdocs/swaggerdefinition");
 const port = process.env.PORT;
 app.use(express.json());
 
+const options = {
+    swaggerDefinition,
+    swaggerOptions: {
+        authAction: { JWT: { name: "JWT", schema: { type: "apiKey", in: "header", name: "Authorization", description: "" }, value: "<JWT>" } }
+    },
+    apis: ['./src/swaggerdocs/*'],
+};
+const swaggerSpec = swaggerJSDoc(options);
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/', homerouter);
 app.use('/', userrouter);
