@@ -28,7 +28,7 @@ const userSchema = new Schema({
     sellerType: {
         type: String,
         required: true
-    }
+    },
 }, { timestamps: true });
 
 

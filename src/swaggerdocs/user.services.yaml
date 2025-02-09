@@ -1,0 +1,79 @@
+tags:
+  name: User Signup Section
+components:
+  schemas:
+    user:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Crazy_Ninja
+          required: true
+        contact:
+          type: Number
+          example: 9839563231
+          required: true
+        email:
+          type: string
+          example: abc@gmail.com
+          required: true
+        password:
+          type: string
+          required: true
+        address:
+          type: string
+          example: Lucknow
+          required: true
+        sellerType:
+          type: string
+          example: Commodity
+          required: true
+paths:
+  /signup:
+    post:
+      summary: This API is used to Register new user in Instagram.
+      tags: [User Signup Section]
+      description: User can register by filling the entries.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/user"
+      responses:
+        "201":
+          description: Created.
+        "406":
+          description: Value not accepted.
+        "500":
+          description: Inernal server error.
+  /login:
+    post:
+      summary: This API is used to Logged In in KishanCircle.
+      tags: [User Login Section]
+      description: User can login by filling the entries.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/user"
+      responses:
+        "200":
+          description: Authorized.
+        "401":
+          description: Unauthorized Response.
+        "500":
+          description: Inernal server error.
+  /profile/view:
+    get:
+      summary: This API is used to get profile .
+      tags: [User profile Section]
+      description: User can view profile using this api
+      responses:
+        "200":
+          description: Authorized.
+        "401":
+          description: Unauthorized Response.
+        "500":
+          description: Inernal server error.

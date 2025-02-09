@@ -3,11 +3,8 @@ const User = require("../models/user.schema");
 const { Session } = require("../models/session.schema");
 const { maintain_session_redis } = require("../middleware/user.sessionredis");
 
-
 const maintain_session_service = async (req, res) => {
     try {
-        const check_user = await verify_token(req);
-        req.user = check_user;
         const isUser = await User.find({ email: req.user.email });
 
         if (isUser) {

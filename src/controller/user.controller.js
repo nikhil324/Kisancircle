@@ -1,4 +1,4 @@
-const { registerUser, userLogin, userProfile, userProfilePassUpdate, userProfilePUpdate, userLogout } = require('../services/user.services');
+const { registerUser, userLogin, userProfile, userProfilePassUpdate, userProfilePUpdate, userLogout, OtpGenarationtoUpdatePass } = require('../services/user.services');
 
 const registerController = async (req, res) => {
     try {
@@ -25,6 +25,7 @@ const loginController = async (req, res) => {
         else {
             const token = result.token;
             res.cookie("token", token, { expires: new Date(Date.now() + 8 * 3600000) });
+            console.log(token);
             res.status(201).send({ Login: result.success });
         }
     }
@@ -39,13 +40,13 @@ const logoutController = async (req, res) => {
 
         const result = await userLogout(req);
 
-        if (!result.success) {
+        if (!result) {
             return res.status(403).send({ message: result.message });
         }
 
         res.clearCookie("token");
 
-        return res.status(200).send({ message: `${result.email} has been logged out` });
+        return res.status(200).send({ message: "You have been logged out" });
 
     } catch (error) {
         console.error("Logout error:", error);
@@ -67,6 +68,15 @@ const profileController = async (req, res) => {
     } catch (error) {
         res.status(500).send(error);
 
+    }
+}
+
+const OtptoUpdatePassController = async (req, res) => {
+    try {
+        await OtpGenarationtoUpdatePass(req, res);
+    }
+    catch (err) {
+        res.status(500).send(err);
     }
 }
 const profilePassUpdateController = async (req, res) => {
@@ -109,5 +119,6 @@ module.exports = {
     profileController,
     profilePassUpdateController,
     profileUpdateController,
-    logoutController
+    logoutController,
+    OtptoUpdatePassController
 };
