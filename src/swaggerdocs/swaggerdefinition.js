@@ -32,6 +32,7 @@ const swaggerDefinition = {
     security: [{
         bearerAuth: []
     }]
+
 }
 
 module.exports = { swaggerDefinition };

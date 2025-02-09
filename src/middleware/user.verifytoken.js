@@ -5,9 +5,11 @@ dotenv.config();
 
 
 const verify_token = async (req) => {
-    const token = req.headers.authorization;
+    var token = req.headers.authorization;
     if (token) {
-
+        if (token.slice(0, 6) === "Bearer") {
+            token = token.slice(7, token.length);
+        }
         const decoded = jwt.verify(token, process.env.SECRETKEY);
         return decoded;
     }

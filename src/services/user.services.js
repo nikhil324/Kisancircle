@@ -3,8 +3,12 @@ const User = require('../models/user.schema');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require("dotenv").config();
-const { verify_token } = require("../middleware/user.verifytoken");
+const { Session } = require("../models/session.schema");
 const { maintain_session_control } = require("../controller/user.sessioncontroller");
+const { distroy_session_redis } = require('../middleware/user.sessionredis');
+const { mailforPasswordUpdate } = require('../services/user.mailservice');
+const { UserOtpVerification } = require('../models/user.otpverification')
+
 
 
 const registerUser = async (req) => {
@@ -17,11 +21,11 @@ const registerUser = async (req) => {
         console.log(registerdata);
 
         const token = jwt.sign({ email: data.email, user_id: data._id, name: data.name }, process.env.SECRETKEY, { expiresIn: "1d" });
-
-        await maintain_session_control(req);
+        req.user = { name: data.name, email: data.email, user_id: data._id };
         const result = await registerdata.save();
+        await maintain_session_control(req);
         result.token = token;
-
+        console.log(token);
         return result;
     }
     catch (error) {
@@ -50,10 +54,8 @@ const userLogin = async (req) => {
             process.env.SECRETKEY,
             { expiresIn: "1d" }
         );
-
-
-
-
+        console.log(token);
+        req.user = { name: user.name, email: user.email, user_id: user._id };
         // console.log(token);
         await maintain_session_control(req);
 
@@ -66,62 +68,61 @@ const userLogin = async (req) => {
 
 const userLogout = async (req) => {
     try {
-
-        const email = req.email;
-
-        if (!email) {
-            return { success: false, message: "User already logged out" };
-        }
-
-        return { success: true, email };
-
-    } catch (error) {
-        console.error("Error while logging out:", error);
-        return { success: false, message: "Internal Server Error" };
+        //const isSession = await Session.find({ user_id: req.user.user_id });
+        await Session.findOneAndUpdate({ user_id: req.user.user_id }, { status: false });
+        await distroy_session_redis(req);
+        return true;
+    }
+    catch (err) {
+        return false;
     }
 };
 
-
-
-
-
 const userProfile = async (req) => {
     try {
-        if (!req.email) {
-            return { success: false, message: "Email is required" };
-        }
-
-        const user = await User.findOne({ email: req.email });
-
-        if (!user) {
-            return { success: false, message: "User not found" };
-        }
-
-        return { success: true, user };
-
-    } catch (error) {
+        // if (!req.email) {
+        //     return { success: false, message: "Email is required" };
+        // }
+        // const user = await User.findOne({ email: req.email });
+        // if (!user) {
+        //     return { success: false, message: "User not found" };
+        // }
+        return { success: true, user: req.user };
+    }
+    catch (error) {
         console.error("Error fetching user profile:", error);
         return { success: false, message: "Internal server error" };
     }
 };
+const OtpGenarationtoUpdatePass = async (req, res) => {
+    try {
+        await mailforPasswordUpdate(req, res);
+    }
+    catch (err) {
+        console.error("Error while generating OTP:", err);
+    }
+}
 const userProfilePassUpdate = async (req) => {
     try {
 
-        if (!req.email) {
-            return { success: false, message: "Email is required" };
-        }
-        const user = await User.findOne({ email: req.email });
-        console.log(user);
+        // if (!req.email) {
+        //     return { success: false, message: "Email is required" };
+        // }
+        const user = await User.findOne({ email: req.user.email });
+        // console.log(user);
 
-        const { password, newPassword } = req.body;
-
-        const isCorrectPassword = await bcrypt.compare(password, user.password);
-        if (!isCorrectPassword) {
-            return { success: false, message: "user current password is incorrect" };
-        } else {
-            const password = await bcrypt.hash(newPassword, parseInt(process.env.SALT));
-            user.password = password;
+        const { otp, newPassword } = req.body;
+        const otpdata = await UserOtpVerification.findOne({ email: user.email });
+        if (otpdata.expiresAt < Date.now()) {
+            return { success: false, message: "OTP expired please regenerate otp " };
         }
+        const encryptotp = await bcrypt.compare(otp, otpdata.otp);
+        if (!encryptotp) {
+            return { success: false, message: "Please look into email and enter correct otp" }
+
+        }
+        const password = await bcrypt.hash(newPassword, parseInt(process.env.SALT));
+        user.password = password;
         await user.save();
         return { success: true, message: "user password has been changed " };
     } catch (error) {
@@ -131,10 +132,10 @@ const userProfilePassUpdate = async (req) => {
 }
 const userProfilePUpdate = async (req) => {
     try {
-        if (!req.email) {
-            return { success: false, message: "Email is required" };
-        }
-        const user = await User.findOne({ email: req.email });
+        // if (!req.email) {
+        //     return { success: false, message: "Email is required" };
+        // }
+        const user = await User.findOne({ email: req.user.email });
         Object.keys(req.body).forEach(key => { user[key] = req.body[key] });
         await user.save();
         return { success: true, message: "user prfile updated successfully" };
@@ -152,5 +153,5 @@ const userProfilePUpdate = async (req) => {
 
 module.exports = {
     registerUser, userLogin, userLogout,
-    userProfile, userProfilePassUpdate, userProfilePUpdate
+    userProfile, userProfilePassUpdate, userProfilePUpdate, OtpGenarationtoUpdatePass
 };
