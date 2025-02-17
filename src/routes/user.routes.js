@@ -6,12 +6,9 @@ const { registerController,
     profilePassUpdateController,
     profileUpdateController,
     logoutController,
-    OtptoUpdatePassController,
-    createPostController,
-    createCommentController } = require('../controller/user.controller');
+    OtptoUpdatePassController } = require('../controller/user.controller');
 //const { authorization } = require('../middleware/user.authorization');
 const { validate_session_redis } = require("../middleware/user.sessionredis");
-const { validate } = require('../models/user.schema');
 
 userrouter.route('/').get();
 userrouter.route('/signup').post(registerController);
@@ -21,8 +18,6 @@ userrouter.route('/profile/view').get(validate_session_redis, profileController)
 userrouter.route('/profile/otptoupdatepass').post(validate_session_redis, OtptoUpdatePassController);
 userrouter.route('/profile/updatePassword').patch(validate_session_redis, profilePassUpdateController);
 userrouter.route('/profile/updateProfile').patch(validate_session_redis, profileUpdateController);
-userrouter.route('/createpost').post(validate_session_redis, createPostController);
-userrouter.route('/createcomment/:postId').post(validate_session_redis, createCommentController);
 
 
 

@@ -1,6 +1,5 @@
 const { registerUser, userLogin, userProfile, userProfilePassUpdate,
-    userProfilePUpdate, userLogout, OtpGenarationtoUpdatePass,
-    userCreatePost, userCreateComment } = require('../services/user.services');
+    userProfilePUpdate, userLogout, OtpGenarationtoUpdatePass } = require('../services/user.services');
 
 const registerController = async (req, res) => {
     try {
@@ -113,32 +112,7 @@ const profileUpdateController = async (req, res) => {
 
     }
 }
-const createPostController = async (req, res) => {
-    try {
-        const result = await userCreatePost(req);
-        if (!result) {
-            res.status(401).send("Error while creating post");
-        }
-        res.status(201).send({ Post: result });
 
-    } catch (error) {
-        res.status(500).send(error);
-
-    }
-}
-const createCommentController = async (req, res) => {
-    try {
-        const result = await userCreateComment(req);
-        if (!result) {
-            res.status(401).send("Error while creating comment");
-        }
-        res.status(201).send({ Comment: result });
-
-    } catch (error) {
-
-    }
-
-}
 
 
 module.exports = {
@@ -148,7 +122,5 @@ module.exports = {
     profilePassUpdateController,
     profileUpdateController,
     logoutController,
-    OtptoUpdatePassController,
-    createPostController,
-    createCommentController
+    OtptoUpdatePassController
 };
