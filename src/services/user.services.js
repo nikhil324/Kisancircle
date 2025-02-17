@@ -80,13 +80,10 @@ const userLogout = async (req) => {
 
 const userProfile = async (req) => {
     try {
-        // if (!req.email) {
-        //     return { success: false, message: "Email is required" };
-        // }
-        // const user = await User.findOne({ email: req.email });
-        // if (!user) {
-        //     return { success: false, message: "User not found" };
-        // }
+
+        const user = await User.findOne({ email: req.user.email });
+
+        req.user = user;
         return { success: true, user: req.user };
     }
     catch (error) {
@@ -105,9 +102,7 @@ const OtpGenarationtoUpdatePass = async (req, res) => {
 const userProfilePassUpdate = async (req) => {
     try {
 
-        // if (!req.email) {
-        //     return { success: false, message: "Email is required" };
-        // }
+
         const user = await User.findOne({ email: req.user.email });
         // console.log(user);
 
@@ -151,6 +146,8 @@ const userProfilePUpdate = async (req) => {
 
 
 }
+
+
 
 module.exports = {
     registerUser, userLogin, userLogout,
