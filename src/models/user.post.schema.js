@@ -1,3 +1,4 @@
+const { required } = require('joi');
 const mongoose = require('mongoose');
 
 const postSchema = new mongoose.Schema({
@@ -21,10 +22,6 @@ const postSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    sellatrupee: {
-        type: Number,
-        required: true
-    },
     selltill: {
         type: Date,
         required: true,
@@ -34,16 +31,41 @@ const postSchema = new mongoose.Schema({
             },
             message: 'selltill must be a future date'
         }
-    }
-}, { timestamps: true });
+    },
+    base_price: {
+        type: Number,
+        required: true,
+    },
+    quantity: {
+        type: Number,
+        required: true,
+        validate: {
+            validator: function (value) {
+                return value > 0;
+            },
+            message: " value must be greater then 0 "
+        }
+    },
+    is_sold: {
+        type: Boolean,
+        default: false
+    },
+},
+    { timestamps: true });
 
 function arrayLimit(val) {
     return val.length > 0;
 }
-
+postSchema.virtual('best_price').get(function () {
+    return this.base_price;
+});
 // Virtual to check if the post is still valid
 postSchema.virtual('isActive').get(function () {
     return this.selltill > new Date();
 });
-
+postSchema.virtual('RupeePerKg').get(function () {
+    return this.base_price / this.quantity;
+})
+postSchema.set('toJSON', { virtuals: true });
+postSchema.set('toObject', { virtuals: true });
 module.exports = mongoose.model('Post', postSchema);
